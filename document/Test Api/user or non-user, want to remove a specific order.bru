@@ -1,0 +1,16 @@
+meta {
+  name: user or non-user, want to remove a specific order
+  type: http
+  seq: 14
+}
+
+delete {
+  url: http://localhost:5000/api/orders/69818c0cb638eabc77cf4546
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

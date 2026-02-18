@@ -1,0 +1,31 @@
+meta {
+  name: admin want to add new food
+  type: http
+  seq: 7
+}
+
+post {
+  url: http://localhost:5000/api/food/new
+  body: json
+  auth: inherit
+}
+
+headers {
+  email: admin@gmail.com
+  password: admin01
+}
+
+body:json {
+  {
+    "name": "Pommes Pilées",
+    "category": "Traditional",
+    "cost": "500 FCFA",
+    "description": "😎 Take a minute to enjoy one of a west region speciality !",
+    "image": "/image.png"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

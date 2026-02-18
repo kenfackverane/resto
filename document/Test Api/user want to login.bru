@@ -1,0 +1,23 @@
+meta {
+  name: user want to login
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:5000/api/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  { 
+  "email": "stuefotso@gmail.com",
+  "password": "kennyfotso2007"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

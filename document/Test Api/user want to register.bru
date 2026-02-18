@@ -1,0 +1,25 @@
+meta {
+  name: user want to register
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:5000/api/register
+  body: json
+  auth: inherit
+}
+
+body:json {
+  { 
+    "name": "kenny fotso",
+    "email": "stuefotso@gmail.com",
+    "password": "kennyfotso2007",
+    "cf_password": "kennyfotso2007"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

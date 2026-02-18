@@ -1,0 +1,21 @@
+meta {
+  name: admin want to delete a specific user
+  type: http
+  seq: 6
+}
+
+delete {
+  url: http://localhost:5000/api/user/69812943b28fa04e390beb8b
+  body: none
+  auth: inherit
+}
+
+headers {
+  email: admin@gmail.com
+  password: admin01
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

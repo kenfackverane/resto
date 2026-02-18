@@ -1,0 +1,25 @@
+meta {
+  name: user want to make order
+  type: http
+  seq: 12
+}
+
+post {
+  url: http://localhost:5000/api/order/new
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "kenny fotso",
+    "email": "stuefotso@gmail.com",
+    "foodName": "Pommes Pilées",
+    "address": "New-bell, carrefour roger milla"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

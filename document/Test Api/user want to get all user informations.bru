@@ -1,0 +1,28 @@
+meta {
+  name: user want to get all user informations
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://localhost:5000/api/users
+  body: none
+  auth: inherit
+}
+
+headers {
+  email: stuefotso@gmail.com
+  password: kennyfotso2007
+}
+
+body:json {
+  {
+    "email": "stuefotso@gmail.com",
+    "password": "kennyfotso2007"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
