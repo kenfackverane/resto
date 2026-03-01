@@ -1,28 +1,12 @@
 import React from "react";
+
 const Loading = () => {
   return (
-    <div
-      className="position-fixed w-full h-[83vh] text-center loading"
-      style={{
-        background: "transparent",
-        color: "white",
-        top: 0,
-        left: 0,
-        opacity: 50,
-        zIndex: 9,
-      }}
-    >
-      <svg width="205" height="250" viewBox="0 0 40 50">
-        <polygon
-          strokeWidth="1"
-          stroke="#fff"
-          fill="none"
-          points="20,1 40,40 1,40"
-        ></polygon>
-        <text fill="#fff" x="5" y="47">
-          Loading
-        </text>
-      </svg>
+    <div className="fixed inset-0 flex items-center justify-center bg-black/30 z-50 pointer-events-none">
+      <div className="flex flex-col items-center">
+        <div className="w-12 h-12 border-4 border-green-400 border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-white mt-3 font-semibold">Loading...</p>
+      </div>
     </div>
   );
 };

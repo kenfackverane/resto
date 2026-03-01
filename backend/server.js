@@ -1,46 +1,46 @@
-const express = require("express"); //------------------------
-const cors = require("cors"); //                             |
-const bodyParser = require("body-parser"); //                |----> (Importations de modules node.js (js, express, cors, body-parser), et de la function de connection à notre database (connectDatabase))
-const { readdirSync } = require("fs"); //                    |
-const connectDatabase = require("./utils/database"); //-------
+const express = require("express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const { readdirSync } = require("fs");
+const connectDatabase = require("./utils/database");
+const session = require("express-session");
+const path = require("path");
 
-const app = express(); //On se base sur express pour créer l'app (le seveur backend)
+require("dotenv").config();
 
-require("dotenv").config(); //via l'importation dotenv, on permet à tous nos fichiers de pourvoir retrouver un élément qu'ils ont besoin dans notre ficher .env 
+const app = express();
 
-connectDatabase(); //On se connecte à notre database mongoDB
+connectDatabase();
 
-app.use(bodyParser.json()); //On initie (ou encore on "prévient" node.js, comme j'aime souvent le dire !), l'utilisation du module bodyParser et spécifiquement sa méthode .json() 
-app.use(cors()); //De même, on initie l'utilisation du module cors 
+app.use(bodyParser.json());
+app.use(cors());
 
-const session = require("express-session"); //Demarage de la session de base
 app.use(
   session({
-    secret: "secret_key",
+    secret: process.env.JWT_SECRET || "secret_key",
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 // 1 heure
+      maxAge: 1000 * 60 * 60
     }
   })
 );
 
-
-readdirSync("./routes").map((r) => { //On établit nos routes sur une branche, appelée "api"
+readdirSync("./routes").map((r) => {
   app.use("/api", require(`./routes/${r}`));
 });
 
-const port = process.env.PORT || 5000; //Le port du serveur, soit 5000, soit celui du fichier .env
+const port = process.env.PORT || 5000;
 
-app.get('/', (req, res) => { //Ici, on crée une page de reconnaissance visuelle !
+app.get('/', (req, res) => {
   res.send('😉 Hello from resto server !');
 });
 
-app.get('/image/', (req, res) => {
-  res.sendfile("./image.png");
-})
+app.get('/image', (req, res) => {
+  res.sendFile(path.join(__dirname, "image.png"));
+});
 
-app.listen(port, () => { // On démarre le serveur ici !
+app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
 });

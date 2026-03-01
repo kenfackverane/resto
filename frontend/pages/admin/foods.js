@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import AdminDrawer from "../../components/admin/AdminDrawer";
 import AdminSidebar from "../../components/admin/AdminSidebar";
-import { Add, Cancel, Image as ImageIcon } from "@mui/icons-material";
+import { Add, Cancel } from "@mui/icons-material";
 import { Modal, Tooltip } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchFoods } from "../../redux/slices/foodSlice";
@@ -11,6 +11,13 @@ import axios from "axios";
 import Loading from "../../components/Loading";
 import AdminFoodList from "../../components/admin/AdminFoodList";
 
+// ✅ NEW: drag/drop + upload helper
+import ImageDropzone from "../../components/ImageDropzone";
+import {
+  uploadToCloudinary,
+  optimizeCloudinaryUrl,
+} from "../../utils/cloudinaryUpload";
+
 const FoodsAdminPage = () => {
   const [openModal, setOpenModal] = useState(false);
 
@@ -19,7 +26,8 @@ const FoodsAdminPage = () => {
   const [cost, setCost] = useState("");
   const [description, setDescription] = useState("");
 
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [file, setFile] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const { enqueueSnackbar } = useSnackbar();
@@ -28,33 +36,31 @@ const FoodsAdminPage = () => {
   const user = useSelector((state) => state?.user?.user ?? null);
   const data = useSelector((state) => state?.food?.data ?? []);
 
-  // ✅ Fetch foods once (no infinite loop)
   useEffect(() => {
     dispatch(fetchFoods());
   }, [dispatch]);
 
-  // ✅ Redirect if not logged in
   useEffect(() => {
     if (user === null) Router.push("/");
   }, [user]);
 
   const previewUrl = useMemo(() => {
-    if (!selectedImage) return "";
-    return URL.createObjectURL(selectedImage);
-  }, [selectedImage]);
+    if (!file) return "";
+    return URL.createObjectURL(file);
+  }, [file]);
 
   const resetForm = () => {
     setName("");
     setCategory("");
     setCost("");
     setDescription("");
-    setSelectedImage(null);
+    setFile(null);
+    setUploadProgress(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ✅ Basic validations
     if (!name.trim() || !category.trim() || !cost.trim()) {
       enqueueSnackbar("⚠️ Please fill name, category and price.", {
         variant: "warning",
@@ -63,7 +69,7 @@ const FoodsAdminPage = () => {
       return;
     }
 
-    if (!selectedImage) {
+    if (!file) {
       enqueueSnackbar("⚠️ Please choose an image.", {
         variant: "warning",
         autoHideDuration: 2500,
@@ -71,62 +77,18 @@ const FoodsAdminPage = () => {
       return;
     }
 
-    // ✅ Read cloudinary env
-    const cloudApi = process.env.NEXT_PUBLIC_CLOUDINARY_API;
-    const uploadPreset = process.env.NEXT_PUBLIC_UPLOAD_PRESET;
-    const cloudName = process.env.NEXT_PUBLIC_CLOUD_NAME;
-
-    if (!cloudApi || !uploadPreset || !cloudName) {
-      enqueueSnackbar(
-        "❌ Cloudinary config missing (.env.local). Add NEXT_PUBLIC_CLOUDINARY_API, NEXT_PUBLIC_UPLOAD_PRESET, NEXT_PUBLIC_CLOUD_NAME",
-        { variant: "error", autoHideDuration: 5000 }
-      );
-
-      // Extra debug notification (optional)
-      enqueueSnackbar(
-        `Debug: api=${String(cloudApi)} preset=${String(uploadPreset)} cloud=${String(cloudName)}`,
-        { variant: "info", autoHideDuration: 6000 }
-      );
-      return;
-    }
-
     setLoading(true);
-    enqueueSnackbar("⏳ Uploading image...", {
-      variant: "info",
-      autoHideDuration: 1500,
-    });
+    setUploadProgress(null);
 
     try {
-      // ✅ Upload image to Cloudinary
-      const formData = new FormData();
-      formData.append("file", selectedImage);
-      formData.append("upload_preset", uploadPreset);
-      formData.append("cloud_name", cloudName);
-
-      const uploadRes = await fetch(cloudApi, {
-        method: "POST",
-        body: formData,
+      enqueueSnackbar("⏳ Uploading image...", {
+        variant: "info",
+        autoHideDuration: 1200,
       });
 
-      const uploadData = await uploadRes.json();
-
-      // ✅ Show real Cloudinary error message
-      if (!uploadRes.ok) {
-        const cloudMsg =
-          uploadData?.error?.message ||
-          uploadData?.error ||
-          "Cloudinary upload error";
-        throw new Error(`Cloudinary: ${cloudMsg}`);
-      }
-
-      if (!uploadData?.secure_url) {
-        throw new Error("Cloudinary: No secure_url returned");
-      }
-
-      enqueueSnackbar("✅ Image uploaded successfully!", {
-        variant: "success",
-        autoHideDuration: 1500,
-      });
+      // ✅ Upload + compression + progress
+      let imageUrl = await uploadToCloudinary(file, (p) => setUploadProgress(p));
+      imageUrl = optimizeCloudinaryUrl(imageUrl);
 
       // ✅ Get user from localStorage (for your headers)
       const userLocal =
@@ -134,16 +96,13 @@ const FoodsAdminPage = () => {
           ? JSON.parse(window.localStorage.getItem("user") || "null")
           : null;
 
-      if (!userLocal?.email) {
-        throw new Error("User not found in localStorage");
-      }
+      if (!userLocal?.email) throw new Error("User not found in localStorage");
 
       enqueueSnackbar("⏳ Saving food to database...", {
         variant: "info",
-        autoHideDuration: 1500,
+        autoHideDuration: 1200,
       });
 
-      // ✅ Post new food with Cloudinary image url
       const apiRes = await axios.post(
         "http://localhost:5000/api/food/new",
         {
@@ -151,14 +110,11 @@ const FoodsAdminPage = () => {
           category: category.trim().toLowerCase(),
           cost: cost.trim(),
           description: description.trim(),
-          image: uploadData.secure_url,
+          image: imageUrl,
         },
-        {
-          headers: { email: `${userLocal.email}`, password: `admin01` },
-        }
+        { headers: { email: `${userLocal.email}`, password: `admin01` } }
       );
 
-      // ✅ Refresh list
       dispatch(fetchFoods());
 
       enqueueSnackbar(apiRes?.data?.message || "✅ Food added successfully!", {
@@ -166,22 +122,17 @@ const FoodsAdminPage = () => {
         autoHideDuration: 2500,
       });
 
-      setLoading(false);
       setOpenModal(false);
       resetForm();
     } catch (err) {
-      setLoading(false);
-
-      // Show detailed error (cloudinary or backend)
       const msg =
         err?.response?.data?.message ||
         err?.message ||
         "Something went wrong";
-
-      enqueueSnackbar(`❌ ${msg}`, {
-        variant: "error",
-        autoHideDuration: 5000,
-      });
+      enqueueSnackbar(`❌ ${msg}`, { variant: "error", autoHideDuration: 5000 });
+    } finally {
+      setLoading(false);
+      setTimeout(() => setUploadProgress(null), 1200);
     }
   };
 
@@ -233,7 +184,7 @@ const FoodsAdminPage = () => {
 
           {/* Modal */}
           <Modal open={openModal} onClose={() => setOpenModal(false)}>
-            <div className="h-full w-full md:h-[660px] md:w-[520px] border-none rounded-2xl outline-none bg-gray-800 absolute top-1/2 right-1/2 translate-x-1/2 -translate-y-1/2 p-4">
+            <div className="h-full w-full md:h-[740px] md:w-[520px] border-none rounded-2xl outline-none bg-gray-800 absolute top-1/2 right-1/2 translate-x-1/2 -translate-y-1/2 p-4">
               <div className="flex flex-col items-center relative justify-center h-full">
                 <h2 className="text-green-200 font-extrabold text-xl mb-2">
                   Add New Food
@@ -276,39 +227,13 @@ const FoodsAdminPage = () => {
                       placeholder="Description"
                     />
 
-                    {/* Image picker */}
-                    <div className="w-full flex items-center justify-between gap-3">
-                      <label
-                        htmlFor="image"
-                        className="flex items-center gap-2 cursor-pointer rounded-xl border border-white/10 bg-white/5 px-4 py-3 hover:bg-white/10 transition"
-                      >
-                        <ImageIcon className="text-green-400" />
-                        <span className="text-green-100 font-semibold text-sm">
-                          {selectedImage?.name
-                            ? selectedImage.name
-                            : "Choose image"}
-                        </span>
-                      </label>
-
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) =>
-                          setSelectedImage(e.target.files?.[0] || null)
-                        }
-                        className="hidden"
-                        id="image"
-                      />
-                    </div>
-
-                    {/* Preview */}
-                    {selectedImage && (
-                      <img
-                        src={previewUrl}
-                        alt="preview"
-                        className="mt-2 h-28 w-28 object-cover rounded-2xl border border-white/10 self-center"
-                      />
-                    )}
+                    {/* ✅ Drag & Drop + preview + progress */}
+                    <ImageDropzone
+                      file={file}
+                      setFile={setFile}
+                      previewUrl={previewUrl}
+                      progress={uploadProgress}
+                    />
 
                     <button
                       type="submit"

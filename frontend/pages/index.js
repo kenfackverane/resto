@@ -9,8 +9,9 @@ const Home = () => {
       <div className="pointer-events-none absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-green-400/10 blur-3xl" />
 
       <div className="max-w-6xl mx-auto px-4 py-10 min-h-[83vh] grid md:grid-cols-2 gap-10 items-center">
+        
         {/* LEFT */}
-        <section className="relative">
+        <section className="relative text-center md:text-left">
           <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-white/5 px-4 py-2 text-emerald-200 backdrop-blur">
             <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
             Fresh • Healthy • Fast delivery
@@ -33,23 +34,18 @@ const Home = () => {
             . Simple, quick and delicious.
           </p>
 
-          <div className="mt-7 flex flex-wrap gap-3">
+          {/* BUTTON */}
+          <div className="mt-7 flex justify-center md:justify-start">
             <Link href="/foods">
-              <button className="group inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-400 px-5 py-3 font-bold text-emerald-950 shadow-lg shadow-emerald-500/20 transition hover:scale-[1.02] hover:bg-emerald-300 active:scale-[0.98]">
+              <button className="group inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-400 px-6 py-3 font-bold text-emerald-950 shadow-lg shadow-emerald-500/30 transition hover:scale-105 hover:bg-emerald-300 active:scale-95">
                 Order Now
                 <span className="transition group-hover:translate-x-0.5">→</span>
-              </button>
-            </Link>
-
-            <Link href="/register">
-              <button className="rounded-xl border border-white/15 bg-white/5 px-5 py-3 font-semibold text-green-50 backdrop-blur transition hover:bg-white/10">
-                Create account
               </button>
             </Link>
           </div>
 
           {/* quick stats */}
-          <div className="mt-8 grid grid-cols-3 gap-3 max-w-md">
+          <div className="mt-8 grid grid-cols-3 gap-3 max-w-md mx-auto md:mx-0">
             <div className="rounded-2xl border border-white/10 bg-white/5 p-3 backdrop-blur">
               <p className="text-green-50 font-extrabold text-lg">15–25m</p>
               <p className="text-green-100/70 text-sm">Delivery</p>
@@ -67,14 +63,14 @@ const Home = () => {
 
         {/* RIGHT */}
         <section className="relative flex justify-center items-center">
-          {/* card */}
           <div className="relative w-full max-w-md rounded-3xl border border-white/10 bg-white/5 p-4 shadow-2xl shadow-black/20 backdrop-blur">
+
             {/* badge */}
             <div className="absolute -top-3 left-6 rounded-full bg-emerald-400 px-3 py-1 text-xs font-bold text-emerald-950 shadow">
               Today’s Pick
             </div>
 
-            {/* image wrapper */}
+            {/* image */}
             <div className="relative overflow-hidden rounded-2xl">
               <img
                 src="http://localhost:5000/image"
@@ -82,13 +78,12 @@ const Home = () => {
                 className="h-72 w-full object-cover md:h-[420px]"
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = "/food-default.jpg"; // mets une image dans /public
+                  e.target.src = "/food-default.jpg";
                 }}
               />
-              {/* overlay */}
+
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
 
-              {/* bottom info */}
               <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between gap-3">
                 <div className="rounded-2xl bg-black/30 px-4 py-3 backdrop-blur">
                   <p className="text-green-50 font-extrabold">Green Bowl</p>
@@ -102,7 +97,6 @@ const Home = () => {
               </div>
             </div>
 
-            {/* small row */}
             <div className="mt-4 flex items-center justify-between text-sm text-green-100/70">
               <span>Free delivery over €15</span>
               <span className="text-green-200">Secure checkout</span>
