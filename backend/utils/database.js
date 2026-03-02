@@ -1,14 +1,34 @@
-const mongoose = require("mongoose"); //On fait appel à mongoose, un outil mongoDB-node.js qui permet de manipuler les databases mongoDB depuis un serveur js
+// backend/utils/database.js
+const mongoose = require("mongoose");
 
-const connectDatabase = () => { //On crée la fonction de connection à notre database
-  mongoose //qui veut dire en un deux mots : "via mongoose..."
-    .connect(process.env.DB) //"...je me connecter à cette database, indiqué dans le fichier .env sur le paramètre, DB"
-    .then(() => { //"...Et si c'est ok, alors..."
-      console.log("Database is successfully connected"); //"...prévient moi, que : oui, la connection as été éffectué !..."
-    })
-    .catch((err) => { //"...Mais si ce n'est pas le cas, alors..."
-      console.log(err); //"...montre moi où se trouve l'érreur !"
-    });
-};
+let cached = global._mongooseCached;
+if (!cached) cached = global._mongooseCached = { conn: null, promise: null };
 
-module.exports = connectDatabase; //Puis, on exporte tous cela, sur l'alias "connectDatabase"
+async function connectDatabase() {
+  try {
+    const uri = process.env.MONGO_URI;
+
+    console.log("✅ MONGO_URI exists?", !!uri); // debug
+    if (!uri) {
+      throw new Error("❌ MONGO_URI is missing in environment variables");
+    }
+
+    // ✅ éviter de reconnecter à chaque fois
+    if (cached.conn) return cached.conn;
+
+    if (!cached.promise) {
+      cached.promise = mongoose.connect(uri, {
+        // options ok pour mongoose 6+
+      });
+    }
+
+    cached.conn = await cached.promise;
+    console.log("✅ MongoDB connected");
+    return cached.conn;
+  } catch (err) {
+    console.error("❌ MongoDB connection error:", err.message);
+    throw err;
+  }
+}
+
+module.exports = connectDatabase;
