@@ -19,7 +19,7 @@ export default foodSlice.reducer;
 export const fetchFoods = createAsyncThunk("Food/fetch", async () => {
 const user = JSON.parse(window.localStorage.getItem("user"));
 console.log(user.email);
-const url = 'http://localhost:5000/api/foods';
+const url = 'https://resto-backend.vercel.app/api/foods';
 const options = {method: 'GET', headers: {email: `${user.email}`, password: "admin01"}};
 
 try {

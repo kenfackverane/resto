@@ -7,7 +7,7 @@ const AdminUsersList = ({ item }) => {
 
   const handleDelete = async () => {
     const user = JSON.parse(window.localStorage.getItem("user"));
-    const url = `http://localhost:5000/api/user/${item._id}`;
+    const url = `https://resto-backend.vercel.app/api/user/${item._id}`;
     const options = {method: 'DELETE', headers: {email: `${user.email}`, password: "admin01"}};
 
 try {

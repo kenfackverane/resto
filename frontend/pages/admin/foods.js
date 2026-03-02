@@ -104,7 +104,7 @@ const FoodsAdminPage = () => {
       });
 
       const apiRes = await axios.post(
-        "http://localhost:5000/api/food/new",
+        "https://resto-backend.vercel.app/api/food/new",
         {
           name: name.trim(),
           category: category.trim().toLowerCase(),

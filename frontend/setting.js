@@ -1,4 +1,4 @@
 export const setting = {
-    api: "http://localhost:5000/api",
+    api: "https://resto-backend.vercel.app/api",
     admin: "admin01"
 }
