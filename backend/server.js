@@ -25,25 +25,16 @@ connectDatabase();
 
 /* ✅ Middlewares */
 app.use(bodyParser.json());
-
-app.use(
-  cors({
-    origin: true, // large en dev
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "email", "password"],
-  })
-);
-
-app.options("*", cors());
-
 const cors = require("cors");
 
 app.use(cors({
   origin: "https://resto-pxg7-git-main-kenfackveranes-projects.vercel.app",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 }));
+
+app.options("*", cors()); // handle preflight requests
 
 
 app.use(
