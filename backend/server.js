@@ -37,6 +37,15 @@ app.use(
 
 app.options("*", cors());
 
+const cors = require("cors");
+
+app.use(cors({
+  origin: "https://resto-pxg7-git-main-kenfackveranes-projects.vercel.app",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
+
+
 app.use(
   session({
     secret: process.env.JWT_SECRET || "secret_key",
