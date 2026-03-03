@@ -27,7 +27,7 @@ const login = () => {
     e.preventDefault();
     setLoading(true);
     await axios
-      .post(`https://resto-backend.vercel.app/api/login`, {
+      .post(`https://restoback-lime.vercel.app/api/login`, {
         email,
         password,
       })

@@ -27,7 +27,7 @@ const order = () => {
     e.preventDefault();
     setLoading(true);
     await axios
-      .post(`https://resto-backend.vercel.app/api/order/new`, {
+      .post(`https://restoback-lime.vercel.app/api/order/new`, {
         name,
         email,
         foodName,

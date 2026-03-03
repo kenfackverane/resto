@@ -14,7 +14,7 @@ const users = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       const user = JSON.parse(window.localStorage.getItem("user"));
-      const url = 'https://resto-backend.vercel.app/api/users';
+      const url = 'https://restoback-lime.vercel.app/api/users';
 const options = {method: 'GET', headers: {email: `${user.email}`, password: 'admin01'}};
 
 try {

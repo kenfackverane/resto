@@ -73,7 +73,7 @@ const Home = () => {
             {/* image */}
             <div className="relative overflow-hidden rounded-2xl">
               <img
-                src="https://resto-backend.vercel.app/image"
+                src="https://restoback-lime.vercel.app/image"
                 alt="food"
                 className="h-72 w-full object-cover md:h-[420px]"
                 onError={(e) => {

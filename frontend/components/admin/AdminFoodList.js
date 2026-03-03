@@ -27,7 +27,7 @@ const AdminFoodList = ({ item }) => {
 
     try {
       const res = await fetch(
-        `https://resto-backend.vercel.app/api/food/${item._id}`,
+        `https://restoback-lime.vercel.app/api/food/${item._id}`,
         {
           method: "DELETE",
           headers: { email: user.email, password: "admin01" },
@@ -87,7 +87,7 @@ const AdminFoodList = ({ item }) => {
       }
 
       const res = await axios.put(
-        `https://resto-backend.vercel.app/api/food/${item._id}`,
+        `https://restoback-lime.vercel.app/api/food/${item._id}`,
         { name, category, cost, description, image: imageUrl },
         { headers: { email: user.email, password: "admin01" } }
       );
